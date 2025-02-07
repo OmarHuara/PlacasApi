@@ -1,3 +1,4 @@
+using PlacasAPI.Infrastructure.Persistence.DbContextConfig;
 using PlacasAPI.Interfaces;
 using PlacasAPI.Mappings;
 using PlacasAPI.Rest;
@@ -6,12 +7,18 @@ using PlacasAPI.Utils;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+IConfigurationRoot configuration = new ConfigurationBuilder()
+    .SetBasePath(Directory.GetCurrentDirectory())
+    .AddJsonFile("appsettings.json")
+    .Build();
 
+// Add services to the container.
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+DbConfigurationService.ConfigureServices(builder.Services, configuration);
 
 builder.Services.AddScoped<HttpClient, HttpClient>();
 builder.Services.AddScoped<IHtmlScrapingService, HtmlScrapingService>();
