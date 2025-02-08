@@ -1,3 +1,5 @@
+using Elastic.Apm.DiagnosticSource;
+using Elastic.Apm.NetCoreAll;
 using PlacasAPI.Infrastructure.Persistence.DbContextConfig;
 using PlacasAPI.Interfaces;
 using PlacasAPI.Mappings;
@@ -20,6 +22,8 @@ builder.Services.AddSwaggerGen();
 
 DbConfigurationService.ConfigureServices(builder.Services, configuration);
 
+builder.Services.AddElasticApm(new HttpDiagnosticsSubscriber());
+
 builder.Services.AddScoped<HttpClient, HttpClient>();
 builder.Services.AddScoped<IHtmlScrapingService, HtmlScrapingService>();
 builder.Services.AddScoped<IAutomovelService, AutomovelService>();
@@ -27,7 +31,7 @@ builder.Services.AddSingleton(typeof(HtmlParserService));
 builder.Services.AddAutoMapper(typeof(AutomovelMapping));
 
 var app = builder.Build();
-
+app.UseAllElasticApm(configuration);
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
