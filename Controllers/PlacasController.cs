@@ -3,6 +3,7 @@ using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
 using PlacasAPI.Interfaces;
+using PlacasAPI.Utils;
 
 namespace PlacasAPI.Controllers
 {
@@ -11,11 +12,13 @@ namespace PlacasAPI.Controllers
     public class PlacasController : ControllerBase
     {
         private readonly IAutomovelService _automovelService;
+        private readonly GetRandomPlate _getRandomPlate;
         private readonly ILogger<PlacasController> _logger;
 
-        public PlacasController(ILogger<PlacasController> logger, IAutomovelService automovelService)
+        public PlacasController(ILogger<PlacasController> logger, IAutomovelService automovelService, GetRandomPlate getRandomPlate)
         {
             _automovelService = automovelService;
+            _getRandomPlate = getRandomPlate;
             _logger = logger;
         }
 
@@ -36,52 +39,8 @@ namespace PlacasAPI.Controllers
         [HttpGet("/automovel/placa/dinamica/{quantidade}")]
         public List<string> GerarPlacasDinamicas([RegularExpression("^[0-9]*$")] int quantidade)
         {
-            List<string> listaDePlacas = new List<string>();
-            for (int i = 0; i < quantidade; i++)
-            {
-                listaDePlacas.Add(gerarPlaca());
-            }
-            return listaDePlacas;
-        }
-
-        private string gerarPlaca()
-        {
-            StringBuilder placa = new StringBuilder(6);
-            placa.Append(GerandoAs3PrimeirasLetra());
-            placa.Append(GerandoNumero());
-            placa.Append(GerandoNumeroOuLetra());
-            placa.Append(GerandoNumero());
-            return placa.ToString();
-        }
-
-        private string GerandoNumeroOuLetra()
-        {
-            Random rnd = new();
-            if (rnd.Next(0,2) == 0)
-            {
-                char letra = (char)rnd.Next(65, 90);
-                return letra.ToString();
-            }
-            else
-            {
-                return GerandoNumero();
-            }
-        }
-
-        private string GerandoNumero()
-        {
-            Random rnd = new();
-            return rnd.Next(0, 10).ToString();
-        }
-
-        private string GerandoAs3PrimeirasLetra()
-        {
-            StringBuilder letras = new StringBuilder(3);
-            Random rnd = new();
-            letras.Append((char)rnd.Next(65, 90));
-            letras.Append((char)rnd.Next(65, 90));
-            letras.Append((char)rnd.Next(65, 90));
-            return letras.ToString();
+            var plates = _getRandomPlate.GenerateRandomPlates(quantidade);
+            return plates;
         }
     }
 }
