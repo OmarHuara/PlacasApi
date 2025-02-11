@@ -1,7 +1,7 @@
 ﻿using PlacasAPI.Dtos;
 using PlacasAPI.Models;
 
-namespace PlacasAPI.Interfaces
+namespace PlacasAPI.Interfaces.Services
 {
     public interface IHtmlScrapingService
     {

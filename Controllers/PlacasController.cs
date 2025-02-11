@@ -2,7 +2,8 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text;
 using Microsoft.AspNetCore.Mvc;
-using PlacasAPI.Interfaces;
+using PlacasAPI.Dtos;
+using PlacasAPI.Interfaces.Services;
 using PlacasAPI.Utils;
 
 namespace PlacasAPI.Controllers
@@ -28,6 +29,7 @@ namespace PlacasAPI.Controllers
             var response = await _automovelService.SearchCar(nrplaca);
             if (response.HttpCode == HttpStatusCode.OK)
             {
+
                 return Ok(response.ReturnData);
             }
             else
@@ -37,10 +39,10 @@ namespace PlacasAPI.Controllers
         }
 
         [HttpGet("/automovel/placa/dinamica/{quantidade}")]
-        public List<string> GerarPlacasDinamicas([RegularExpression("^[0-9]*$")] int quantidade)
+        public Task<ResponseGeneric<List<AutomovelDto>>> GerarPlacasDinamicas([RegularExpression("^[0-9]*$")] int quantidade)
         {
             var plates = _getRandomPlate.GenerateRandomPlates(quantidade);
-            return plates;
+            return _automovelService.SearchCars(plates);
         }
     }
 }

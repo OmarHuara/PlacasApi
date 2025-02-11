@@ -1,7 +1,9 @@
 using Elastic.Apm.DiagnosticSource;
 using Elastic.Apm.NetCoreAll;
 using PlacasAPI.Infrastructure.Persistence.DbContextConfig;
-using PlacasAPI.Interfaces;
+using PlacasAPI.Infrastructure.Persistence.Repositories;
+using PlacasAPI.Interfaces.Respositories;
+using PlacasAPI.Interfaces.Services;
 using PlacasAPI.Mappings;
 using PlacasAPI.Rest;
 using PlacasAPI.Services;
@@ -27,7 +29,9 @@ builder.Services.AddElasticApm(new HttpDiagnosticsSubscriber());
 builder.Services.AddScoped<HttpClient, HttpClient>();
 builder.Services.AddScoped<IHtmlScrapingService, HtmlScrapingService>();
 builder.Services.AddScoped<IAutomovelService, AutomovelService>();
+builder.Services.AddScoped<IAutomovelRepository, AutomovelRepository>();
 builder.Services.AddSingleton(typeof(HtmlParserService));
+builder.Services.AddSingleton(typeof(GetRandomPlate));
 builder.Services.AddAutoMapper(typeof(AutomovelMapping));
 
 var app = builder.Build();

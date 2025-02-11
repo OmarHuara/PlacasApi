@@ -2,7 +2,7 @@
 using AutoMapper;
 using HtmlAgilityPack;
 using PlacasAPI.Dtos;
-using PlacasAPI.Interfaces;
+using PlacasAPI.Interfaces.Services;
 using PlacasAPI.Models;
 using PlacasAPI.Utils;
 
