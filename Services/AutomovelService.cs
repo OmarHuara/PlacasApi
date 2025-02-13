@@ -1,5 +1,7 @@
 ﻿using System.Dynamic;
 using AutoMapper;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.SqlClient;
 using Microsoft.OpenApi.Validations;
 using PlacasAPI.Dtos;
 using PlacasAPI.Interfaces.Respositories;
@@ -7,60 +9,68 @@ using PlacasAPI.Interfaces.Services;
 using PlacasAPI.Models;
 using PlacasAPI.Rest;
 using PlacasAPI.Utils;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PlacasAPI.Services
 {
     public class AutomovelService : IAutomovelService
     {
         private readonly IMapper _mapper;
-        private readonly HtmlParserService _htmlParserService;
         private readonly IHtmlScrapingService _htmlScrapingService;
         private readonly IAutomovelRepository _automovelRepository;
 
-        public AutomovelService(IMapper mapper, HtmlParserService htmlParserService, IHtmlScrapingService htmlScrapingService, IAutomovelRepository automovelRepository)
+        public AutomovelService(IMapper mapper, IHtmlScrapingService htmlScrapingService, IAutomovelRepository automovelRepository)
         {
             _mapper = mapper;
-            _htmlParserService = htmlParserService;
             _htmlScrapingService = htmlScrapingService;
             _automovelRepository = automovelRepository;
         }
 
-        public async Task<ResponseGeneric<AutomovelDto>> SearchCar(string plate)
+        public async Task<ValueResult<AutomovelDto>> SearchCar(string plate)
         {
             var automovelDb = await _automovelRepository.SearchByPlate(plate);
             if (automovelDb != null)
             {
-                var resultDb = StructuredObjectDb(automovelDb);
-                return _mapper.Map<ResponseGeneric<AutomovelDto>>(resultDb);
+                var resultDb = ValueResult<Automovel>.Success(automovelDb);
+                return _mapper.Map<ValueResult<AutomovelDto>>(resultDb);
             }
 
+            try
+            {
+                var content = GetDataFromTheWebsite(plate);
+                if (content == null)
+                {
+                    return ValueResult<AutomovelDto>.Fail("Error, car data not found");
+                }
+                var automovel = StructuredObject(content);
+                _automovelRepository.Add(automovel.Value);
+                return _mapper.Map<ValueResult<AutomovelDto>>(automovel);
+
+            }
+            catch (SqlException sqlEx)
+            {
+                List<ResultError> errors = new List<ResultError>();
+                errors.Add(new ResultError(sqlEx.Message));
+
+                foreach (SqlError error in sqlEx.Errors)
+                {
+                    errors.Add(new ResultError(error.Number.ToString(), error.Message));
+                }
+                return ValueResult<AutomovelDto>.Fail(errors);
+            }
+        }
+
+        private Dictionary<string, string> GetDataFromTheWebsite(string plate)
+        {
             var htmlContent = _htmlScrapingService.SearchCar(plate);
-            var content = _htmlParserService.ParseHtmlToList(htmlContent, plate);
-            var automovel = StructuredObject(content);
-            _automovelRepository.Add(automovel.ReturnData);
-            return _mapper.Map<ResponseGeneric<AutomovelDto>>(automovel);
+            return new HtmlParserService().ParseHtmlToList(htmlContent, plate);
         }
-        private ResponseGeneric<Automovel> StructuredObjectDb(Automovel automovelDb)
+
+        private ValueResult<Automovel> StructuredObject(Dictionary<string, string> htmlContent)
         {
-            var response = new ResponseGeneric<Automovel>();
-            response.WithData(automovelDb);
-            return response;
-        }
-        private ResponseGeneric<Automovel> StructuredObject(Dictionary<string, string> htmlContent)
-        {
-            var response = new ResponseGeneric<Automovel>();
-            if (htmlContent != null)
-            {
-                var listResponse = _mapper.Map<Automovel>(htmlContent);
-                response.WithData(listResponse);
-            }
-            else
-            {
-                dynamic errorDetails = new ExpandoObject();
-                errorDetails.ErrorMessage = "Plate not found";
-                response.WithError(errorDetails);
-            }
-            return response;
+            var listResponse = _mapper.Map<Automovel>(htmlContent);
+            return ValueResult<Automovel>.Success(listResponse);
+            
         }
         public async Task<ResponseGeneric<List<AutomovelDto>>> SearchCars(List<string> plates)
         {
@@ -76,8 +86,7 @@ namespace PlacasAPI.Services
                 }
                 else
                 {
-                    var htmlContent = _htmlScrapingService.SearchCar(plate);
-                    var content = _htmlParserService.ParseHtmlToList(htmlContent, plate);
+                    var content = GetDataFromTheWebsite(plate);
                     if (content != null)
                     {
                         var automovelForDb = _mapper.Map<Automovel>(content);

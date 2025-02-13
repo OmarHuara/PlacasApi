@@ -1,14 +1,15 @@
 ﻿using AutoMapper;
 using PlacasAPI.Dtos;
 using PlacasAPI.Models;
+using PlacasAPI.Utils;
 
 namespace PlacasAPI.Mappings
 {
-    public class AutomovelMapping : Profile
+    public class AutomovelMappingVR : Profile
     {
-        public AutomovelMapping()
+        public AutomovelMappingVR()
         {
-            CreateMap(typeof(ResponseGeneric<>), typeof(ResponseGeneric<>));
+            CreateMap(typeof(ValueResult<>), typeof(ValueResult<>));
             CreateMap<AutomovelDto, Automovel>()
                 .ForMember(dest => dest.plate, opt => opt.MapFrom(src => src.placa))
                 .ForMember(dest => dest.brand, opt => opt.MapFrom(src => src.marca))
@@ -24,7 +25,9 @@ namespace PlacasAPI.Mappings
                 .ForMember(dest => dest.uf, opt => opt.MapFrom(src => src.uf))
                 .ForMember(dest => dest.Municipality, opt => opt.MapFrom(src => src.municipio))
                 .ForMember(dest => dest.segment, opt => opt.MapFrom(src => src.segmento))
-                .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => src.especieVeiculo));
+                .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => src.especieVeiculo))
+                .ForMember(dest => dest.carBody, opt => opt.MapFrom(src => src.carroceria))
+                .ForMember(dest => dest.capacity, opt => opt.MapFrom(src => src.capacidade));
 
             CreateMap<Automovel, AutomovelDto>()
                 .ForMember(dest => dest.placa, opt => opt.MapFrom(src => src.plate))
@@ -41,7 +44,9 @@ namespace PlacasAPI.Mappings
                 .ForMember(dest => dest.uf, opt => opt.MapFrom(src => src.uf))
                 .ForMember(dest => dest.municipio, opt => opt.MapFrom(src => src.Municipality))
                 .ForMember(dest => dest.segmento, opt => opt.MapFrom(src => src.segment))
-                .ForMember(dest => dest.especieVeiculo, opt => opt.MapFrom(src => src.VehicleType));
+                .ForMember(dest => dest.especieVeiculo, opt => opt.MapFrom(src => src.VehicleType))
+                .ForMember(dest => dest.carroceria, opt => opt.MapFrom(src => src.carBody))
+                .ForMember(dest => dest.capacidade, opt => opt.MapFrom(src => src.capacity));
 
             CreateMap<Dictionary<string, string>, Automovel>()
                 .ForMember(dest => dest.plate, opt => opt.MapFrom(src => GetValueOrDefault(src, "PLATE")))
@@ -58,7 +63,9 @@ namespace PlacasAPI.Mappings
                 .ForMember(dest => dest.uf, opt => opt.MapFrom(src => GetValueOrDefault(src, "UF")))
                 .ForMember(dest => dest.Municipality, opt => opt.MapFrom(src => GetValueOrDefault(src, "MUNICIPIO")))
                 .ForMember(dest => dest.segment, opt => opt.MapFrom(src => GetValueOrDefault(src, "SEGMENTO")))
-                .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => GetValueOrDefault(src, "ESPECIEVEICULO")));
+                .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => GetValueOrDefault(src, "ESPECIEVEICULO")))
+                .ForMember(dest => dest.carBody, opt => opt.MapFrom(src => GetValueOrDefault(src, "CARROCERIA")))
+                .ForMember(dest => dest.capacity, opt => opt.MapFrom(src => GetValueOrDefault(src, "CAPACIDADECARGA")));
         }
         string GetValueOrDefault(Dictionary<string, string> dictionary, string key)
         {
