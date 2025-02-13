@@ -22,5 +22,7 @@ namespace PlacasAPI.Models
         public string? Municipality { get; set; }
         public string? segment { get; set; }
         public string? VehicleType { get; set; }
+        public string? carBody { get; set; }
+        public string? capacity { get; set; }
     }
 }

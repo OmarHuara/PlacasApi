@@ -32,7 +32,7 @@ builder.Services.AddScoped<IAutomovelService, AutomovelService>();
 builder.Services.AddScoped<IAutomovelRepository, AutomovelRepository>();
 builder.Services.AddSingleton(typeof(HtmlParserService));
 builder.Services.AddSingleton(typeof(GetRandomPlate));
-builder.Services.AddAutoMapper(typeof(AutomovelMapping));
+builder.Services.AddAutoMapper(typeof(AutomovelMappingRG));
 
 var app = builder.Build();
 app.UseAllElasticApm(configuration);

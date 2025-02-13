@@ -20,6 +20,8 @@ namespace PlacasAPI.Dtos
             public string? municipio { get; set; }
             public string? segmento { get; set; }
             public string? especieVeiculo { get; set; }
+            public string? carroceria { get; set; }
+            public string? capacidade { get; set; }
 
     }
 }
