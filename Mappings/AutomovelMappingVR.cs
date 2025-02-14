@@ -66,6 +66,25 @@ namespace PlacasAPI.Mappings
                 .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => GetValueOrDefault(src, "ESPECIEVEICULO")))
                 .ForMember(dest => dest.carBody, opt => opt.MapFrom(src => GetValueOrDefault(src, "CARROCERIA")))
                 .ForMember(dest => dest.capacity, opt => opt.MapFrom(src => GetValueOrDefault(src, "CAPACIDADECARGA")));
+
+            CreateMap<Dictionary<string, string>, Automovel>()
+                .ForMember(dest => dest.plate, opt => opt.MapFrom(src => GetValueOrDefault(src, "PLATE")))
+                .ForMember(dest => dest.brand, opt => opt.MapFrom(src => GetValueOrDefault(src, "MARCA")))
+                .ForMember(dest => dest.model, opt => opt.MapFrom(src => GetValueOrDefault(src, "MODELO")))
+                .ForMember(dest => dest.imported, opt => opt.MapFrom(src => GetValueOrDefault(src, "IMPORTADO")))
+                .ForMember(dest => dest.year, opt => opt.MapFrom(src => GetValueOrDefault(src, "ANO")))
+                .ForMember(dest => dest.modelYear, opt => opt.MapFrom(src => GetValueOrDefault(src, "ANOMODELO")))
+                .ForMember(dest => dest.color, opt => opt.MapFrom(src => GetValueOrDefault(src, "COR")))
+                .ForMember(dest => dest.displacement, opt => opt.MapFrom(src => GetValueOrDefault(src, "CILINDRADA")))
+                .ForMember(dest => dest.power, opt => opt.MapFrom(src => GetValueOrDefault(src, "POTENCIA")))
+                .ForMember(dest => dest.fuel, opt => opt.MapFrom(src => GetValueOrDefault(src, "COMBUSTIVEL")))
+                .ForMember(dest => dest.chassis, opt => opt.MapFrom(src => GetValueOrDefault(src, "CHASSI")))
+                .ForMember(dest => dest.uf, opt => opt.MapFrom(src => GetValueOrDefault(src, "UF")))
+                .ForMember(dest => dest.Municipality, opt => opt.MapFrom(src => GetValueOrDefault(src, "MUNICIPIO")))
+                .ForMember(dest => dest.segment, opt => opt.MapFrom(src => GetValueOrDefault(src, "SEGMENTO")))
+                .ForMember(dest => dest.VehicleType, opt => opt.MapFrom(src => GetValueOrDefault(src, "ESPECIEVEICULO")))
+                .ForMember(dest => dest.carBody, opt => opt.MapFrom(src => GetValueOrDefault(src, "CARROCERIA")))
+                .ForMember(dest => dest.capacity, opt => opt.MapFrom(src => GetValueOrDefault(src, "CAPACIDADECARGA")));
         }
         string GetValueOrDefault(Dictionary<string, string> dictionary, string key)
         {
