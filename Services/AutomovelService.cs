@@ -1,28 +1,24 @@
-﻿using System.Dynamic;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
+﻿using AutoMapper;
 using Microsoft.Data.SqlClient;
-using Microsoft.OpenApi.Validations;
 using PlacasAPI.Dtos;
+using PlacasAPI.Integration;
 using PlacasAPI.Interfaces.Respositories;
 using PlacasAPI.Interfaces.Services;
 using PlacasAPI.Models;
-using PlacasAPI.Rest;
 using PlacasAPI.Utils;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace PlacasAPI.Services
 {
     public class AutomovelService : IAutomovelService
     {
         private readonly IMapper _mapper;
-        private readonly IHtmlScrapingService _htmlScrapingService;
+        private readonly IPlateConsultIntegration _plateConsultIntegration;
         private readonly IAutomovelRepository _automovelRepository;
 
-        public AutomovelService(IMapper mapper, IHtmlScrapingService htmlScrapingService, IAutomovelRepository automovelRepository)
+        public AutomovelService(IMapper mapper, IPlateConsultIntegration plateConsultIntegration, IAutomovelRepository automovelRepository)
         {
             _mapper = mapper;
-            _htmlScrapingService = htmlScrapingService;
+            _plateConsultIntegration = plateConsultIntegration;
             _automovelRepository = automovelRepository;
         }
 
@@ -37,8 +33,8 @@ namespace PlacasAPI.Services
 
             try
             {
-                var content = GetDataFromTheWebsite(plate);
-                if (content == null)
+                var content = await _plateConsultIntegration.GetDataFromTheWebsite(plate);
+                if (content == null || content.Count == 0)
                 {
                     return ValueResult<AutomovelDto>.Fail("Error, car data not found");
                 }
@@ -60,11 +56,7 @@ namespace PlacasAPI.Services
             }
         }
 
-        private Dictionary<string, string> GetDataFromTheWebsite(string plate)
-        {
-            var htmlContent = _htmlScrapingService.SearchCar(plate);
-            return new HtmlParserService().ParseHtmlToList(htmlContent, plate);
-        }
+        
 
         private ValueResult<Automovel> StructuredObject(Dictionary<string, string> htmlContent)
         {
@@ -86,7 +78,7 @@ namespace PlacasAPI.Services
                 }
                 else
                 {
-                    var content = GetDataFromTheWebsite(plate);
+                    var content = _plateConsultIntegration.GetDataFromTheWebsite(plate);
                     if (content != null)
                     {
                         var automovelForDb = _mapper.Map<Automovel>(content);

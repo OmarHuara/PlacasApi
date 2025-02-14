@@ -3,8 +3,8 @@ using PlacasAPI.Models;
 
 namespace PlacasAPI.Interfaces.Services
 {
-    public interface IHtmlScrapingService
+    public interface IHtmlScrapingServiceKePlaca
     {
-        string SearchCar(string plate);
+        string SearchCar(string plate, string url);
     }
 }

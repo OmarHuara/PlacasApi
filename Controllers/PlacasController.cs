@@ -1,7 +1,4 @@
 using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Text;
-using System.Text.Json;
 using Microsoft.AspNetCore.Mvc;
 using PlacasAPI.Dtos;
 using PlacasAPI.Interfaces.Services;
